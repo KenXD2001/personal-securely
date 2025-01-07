@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
 import { Icon } from '@iconify/react';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Create the schema for form validation
 const validationSchema = yup.object().shape({
@@ -45,8 +44,13 @@ const LoginPage: React.FC = () => {
                 toast.success('Login successful!');
                 setShowForgotPassword(false); // Hide forgot password link on successful login
 
-                // Save token to localStorage or state
+                // Save token to localStorage
                 localStorage.setItem('authToken', data.token);
+
+                // Optionally, store the token expiration time if provided by the server
+                if (data.tokenExpiration) {
+                    localStorage.setItem('tokenExpiration', data.tokenExpiration);
+                }
 
                 // Redirect to the home/dashboard page
                 setTimeout(() => {
@@ -64,6 +68,7 @@ const LoginPage: React.FC = () => {
             }
         }
     };
+
 
     const handleSignUpClick = () => navigate('/register');
 
@@ -145,7 +150,6 @@ const LoginPage: React.FC = () => {
                     </div>
                 </div>
             </form>
-            <ToastContainer />
         </>
     );
 };

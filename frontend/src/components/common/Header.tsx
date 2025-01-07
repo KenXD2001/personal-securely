@@ -1,10 +1,26 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import { toast } from "react-toastify";
 
 function Header() {
-    const handleSignOut = () => {
-        // Add sign-out logic
-        alert('Signed out successfully!');
+
+    const navigate = useNavigate();
+
+    const handleSignout = () => {
+
+        // Remove the token (or any user data) from localStorage or cookies
+        localStorage.removeItem('authToken'); // Replace 'authToken' with your token key
+
+        // Show toast notification for sign-out
+        toast.info("Signing out... Redirecting to the homepage.", {
+            autoClose: 2000, // Close the toast after 2 seconds
+        });
+
+        // Redirect the user after 2 seconds
+        setTimeout(() => {
+            navigate('/');
+        }, 2000);
     };
 
     return (
@@ -41,7 +57,7 @@ function Header() {
             <div className="flex items-center gap-4">
                 <ThemeToggle />
                 <button
-                    onClick={handleSignOut}
+                    onClick={handleSignout}
                     className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-500 transition-all shadow-md"
                 >
                     Sign Out

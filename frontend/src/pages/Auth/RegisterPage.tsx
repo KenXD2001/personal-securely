@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { toast } from "react-toastify";
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ function RegisterPage() {
         e.preventDefault();
         if (password !== confirmPassword) {
             setErrorMessage("Passwords do not match.");
+            toast.error("Passwords do not match.");
             return;
         }
         setErrorMessage("");
@@ -30,11 +32,6 @@ function RegisterPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "sec-ch-ua-platform": '"Android"',
-                    "Referer": "http://localhost:5173/",
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
-                    "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-                    "sec-ch-ua-mobile": "?1",
                 },
                 body: JSON.stringify({
                     name,
@@ -48,12 +45,18 @@ function RegisterPage() {
             const data = await response.json();
 
             if (response.ok) {
-                // Registration successful, navigate to login page or dashboard
-                navigate('/');
+                // Display success toast
+                toast.success("Account created successfully!");
+                // Redirect to the login page or dashboard
+                navigate("/");
             } else {
+                // Display error toast
+                toast.error(data.message || "Registration failed");
                 setErrorMessage(data.message || "Registration failed");
             }
         } catch (error) {
+            // Display error toast
+            toast.error("Something went wrong, please try again later.");
             setErrorMessage("Something went wrong, please try again later.");
         } finally {
             setIsLoading(false);

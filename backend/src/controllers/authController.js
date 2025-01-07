@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Otp = require('../models/OTP');
+const jwt = require('jsonwebtoken');
 
 // Mock OTP store
 const otpStore = {};
@@ -26,24 +27,33 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-    console.log('Login request received:', { email });
+    console.log('Login attempt:', { email });
 
     try {
+        // Check if the user exists
         const user = await User.findOne({ email });
-        if (!user || user.password !== password) {
-            console.log('Invalid credentials for email:', email);
-            return res.status(401).json({ message: 'Invalid credentials' });
+        if (!user) {
+            console.log('Login failed: Email not found:', email);
+            return res.status(404).json({ message: 'User email not present in the database' });
         }
 
-        // Mock token generation
-        const token = `mock-token-${Date.now()}`;
-        console.log('Login successful for email:', email, 'Token:', token);
+        // Check if the password is correct
+        if (user.password !== password) {
+            console.log('Login failed: Incorrect password for email:', email);
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
+
+        // Generate JWT token with user ID
+        const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+        console.log('Login successful:', { email, token });
         res.json({ token });
+
     } catch (err) {
         console.error('Error during login:', err.message);
         res.status(500).json({ message: err.message });
     }
 };
+
 
 exports.sendOtp = async (req, res) => {
     const { email } = req.body;
@@ -124,6 +134,29 @@ exports.resetPassword = async (req, res) => {
         res.json({ message: 'Password reset successfully' });
     } catch (err) {
         console.error('Error resetting password:', err.message);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.getUserData = async (req, res) => {
+    try {
+        const userId = req.user.userId; // Extract the userId from the token
+        const user = await User.findById(userId); // Fetch the user by ID
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Send the user's data as a response
+        res.json({
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        });
+    } catch (err) {
+        console.error('Error fetching user data:', err.message);
         res.status(500).json({ message: err.message });
     }
 };

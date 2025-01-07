@@ -2,9 +2,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Validation schemas
 const emailSchema = yup.object({
@@ -198,7 +197,6 @@ function ResetPasswordPage() {
                     </button>
                 </>
             )}
-            <ToastContainer />
         </form>
     );
 }
